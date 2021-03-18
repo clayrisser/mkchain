@@ -75,15 +75,15 @@ define done
 endef
 
 define add_dep
-	mkdir -p $(MAKE_CACHE)/deps && echo $2 >> $(MAKE_CACHE)/deps/$1
+	mkdir -p $(DEPS) && echo $2 >> $(DEPS)/$1
 endef
 
 define reset_deps
-	rm $(MAKE_CACHE)/deps/$1 $(NOFAIL)
+	rm $(DEPS)/$1 $(NOFAIL)
 endef
 
 define get_deps
-	cat $(MAKE_CACHE)/deps/$1 $(NOFAIL)
+	cat $(DEPS)/$1 $(NOFAIL)
 endef
 
 define cache
