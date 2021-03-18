@@ -71,15 +71,15 @@ _RUN := $(shell mkdir -p $(_ACTIONS) $(DEPS) $(DONE))
 
 define done
 	$(call reset_deps,$1)
-	mkdir -p $(DONE) && touch -m $(DONE)/$1
+	touch -m $(DONE)/$1
 endef
 
 define add_dep
-	mkdir -p $(DEPS) && echo $2 >> $(DEPS)/$1
+	echo $2 >> $(DEPS)/$1
 endef
 
 define reset_deps
-	rm $(DEPS)/$1 $(NOFAIL)
+	rm -f $(DEPS)/$1 $(NOFAIL)
 endef
 
 define get_deps
