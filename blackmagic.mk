@@ -22,12 +22,18 @@ ifeq ($(PLATFORM),win32)
 	MAKE := make
 	NULL := nul
 	SHELL := cmd.exe
+	GREP ?= grep
+	SED ?= sed
 else
 	BANG := \!
 	NULL := /dev/null
 	SHELL := $(shell bash --version >$(NULL) 2>&1 && echo bash|| echo sh)
-ifeq ($(PLATFORM),linux)
-	TMP_RAM ?= /dev/shm
+ifeq ($(PLATFORM),darwin)
+	GREP ?= ggrep
+	SED ?= gsed
+else
+	GREP ?= grep
+	SED ?= sed
 endif
 endif
 
@@ -53,20 +59,6 @@ DONE := $(MAKE_CACHE)/done
 DEPS := $(MAKE_CACHE)/deps
 ACTION := $(DONE)
 
-ifneq ($(TMP_RAM),)
-define allocate_ram
-	$(shell rm -rf $(MAKE_CACHE) $(NOFAIL) && \
-		mkdir -p $(MAKE_CACHE) && rm -rf $(MAKE_CACHE) && \
-		mkdir -p $(TMP_RAM)$(MAKE_CACHE) && \
-		ln -s $(TMP_RAM)$(MAKE_CACHE) $(MAKE_CACHE))
-endef
-ifeq ($(wildcard $(MAKE_CACHE)),)
-	_RUN := $(call allocate_ram)
-endif
-ifeq ($(wildcard $(TMP_RAM)$(MAKE_CACHE)),)
-	_RUN := $(call allocate_ram)
-endif
-endif
 _RUN := $(shell mkdir -p $(_ACTIONS) $(DEPS) $(DONE))
 
 define done
@@ -87,7 +79,7 @@ define get_deps
 endef
 
 define cache
-	mkdir -p $$(echo $1 | sed 's/\/[^\/]*$$//g') && touch -m $1
+	mkdir -p $$(echo $1 | $(SED) 's/\/[^\/]*$$//g') && touch -m $1
 endef
 
 define clear_cache
@@ -98,15 +90,9 @@ define deps
 	$(patsubst %,$(DONE)/_$1/%,$2)
 endef
 
-ifneq ($(TMP_RAM),)
 define clean
-	rm -rf $(TMP_RAM)$(MAKE_CACHE) $(NOFAIL)
 	rm -rf $(MAKE_CACHE) $(NOFAIL)
 endef
-else
-define clean
-endef
-endif
 
 define ACTION_TEMPLATE
 ifneq ($$({{ACTION_UPPER}}_READY),true)
@@ -125,10 +111,10 @@ endif
 endef
 
 $(_ACTIONS)/%:
-	@ACTION_BLOCK=$(shell echo $@ | grep -oE '[^\/]+$$') && \
-		ACTION=$$(echo $$ACTION_BLOCK | grep -oE '^[^~]+') && \
-		ACTION_DEPENDENCY=$$(echo $$ACTION_BLOCK | grep -oE '~[^~]+$$' $(NOFAIL)) && \
+	@ACTION_BLOCK=$(shell echo $@ | $(GREP) -oE '[^\/]+$$') && \
+		ACTION=$$(echo $$ACTION_BLOCK | $(GREP) -oE '^[^~]+') && \
+		ACTION_DEPENDENCY=$$(echo $$ACTION_BLOCK | $(GREP) -oE '~[^~]+$$' $(NOFAIL)) && \
 		ACTION_UPPER=$$(echo $$ACTION | tr '[:lower:]' '[:upper:]') && \
-		echo "$${ACTION_TEMPLATE}" | sed "s/{{ACTION}}/$${ACTION}/g" | \
-		sed "s/{{ACTION_DEPENDENCY}}/$${ACTION_DEPENDENCY}/g" | \
-		sed "s/{{ACTION_UPPER}}/$${ACTION_UPPER}/g" > $@
+		echo "$${ACTION_TEMPLATE}" | $(SED) "s/{{ACTION}}/$${ACTION}/g" | \
+		$(SED) "s/{{ACTION_DEPENDENCY}}/$${ACTION_DEPENDENCY}/g" | \
+		$(SED) "s/{{ACTION_UPPER}}/$${ACTION_UPPER}/g" > $@
