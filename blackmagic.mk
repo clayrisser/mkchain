@@ -102,7 +102,7 @@ ifneq ($$({{ACTION_UPPER}}_READY),true)
 ~{{ACTION}}: {{ACTION_DEPENDENCY}} $$({{ACTION_UPPER}}_TARGET)
 +{{ACTION}}: _{{ACTION}} $$({{ACTION_UPPER}}_TARGET)
 _{{ACTION}}:
-	@$$(call clear_cache,$$(DONE)/_{{ACTION}})
+	@$$(call clear_cache,$$(DONE)/{{ACTION}})
 $$(DONE)/_{{ACTION}}/%: %
 	@$$(call clear_cache,$$(DONE)/{{ACTION}})
 	@$$(call add_dep,{{ACTION}},$$<)
