@@ -18,16 +18,16 @@
 PLATFORM := $(shell node -e "process.stdout.write(process.platform)")
 
 ifeq ($(PLATFORM),win32)
-  BANG := !
-	MAKE := make
-	NULL := nul
-	SHELL := cmd.exe
+  BANG ?= !
+	MAKE ?= make
+	NULL ?= nul
+	SHELL ?= cmd.exe
 	GREP ?= grep
 	SED ?= sed
 else
-	BANG := \!
-	NULL := /dev/null
-	SHELL := $(shell bash --version >$(NULL) 2>&1 && echo bash|| echo sh)
+	BANG ?= \!
+	NULL ?= /dev/null
+	SHELL ?= $(shell bash --version >$(NULL) 2>&1 && echo bash|| echo sh)
 ifeq ($(PLATFORM),darwin)
 	GREP ?= ggrep
 	SED ?= gsed
@@ -36,16 +36,26 @@ else
 	SED ?= sed
 endif
 endif
+ifeq ($(PLATFORM),linux)
+	NUMPROC ?= $(shell grep -c ^processor /proc/cpuinfo)
+endif
+ifeq ($(PLATFORM),darwin)
+	NUMPROC ?= $(shell sysctl hw.ncpu | awk '{print $$2}')
+endif
+export NUMPROC ?= 1
+MAKEFLAGS += "-j $(NUMPROC)"
 
-CWD ?= $(shell pwd)
-CD ?= cd
-GIT ?= $(shell git --version >$(NULL) 2>&1 && echo git|| echo true)
-NPM ?= $(shell pnpm --version >$(NULL) 2>&1 && echo pnpm|| (yarn --version >$(NULL) 2>&1 && echo yarn|| echo npm))
-NOFAIL := 2>$(NULL)|| true
+CWD := $(shell pwd)
+export CD ?= cd
+export GIT ?= $(shell git --version >$(NULL) 2>&1 && echo git|| echo true)
+export VIRTUALENV ?= virtualenv
+export NPM ?= $(shell pnpm --version >$(NULL) 2>&1 && echo pnpm|| (yarn --version >$(NULL) 2>&1 && echo yarn|| echo npm))
+export SERVICEBLEND ?= serviceblend
+export NOFAIL := 2>$(NULL)|| true
 
 .EXPORT_ALL_VARIABLES:
 
-PROJECT_ROOT ?= $(shell $(GIT) rev-parse --show-superproject-working-tree)
+export PROJECT_ROOT ?= $(shell $(GIT) rev-parse --show-superproject-working-tree)
 ifeq ($(PROJECT_ROOT),)
 	PROJECT_ROOT := $(shell $(GIT) rev-parse --show-toplevel)
 endif
@@ -53,11 +63,18 @@ ifeq ($(PROJECT_ROOT),)
 	PROJECT_ROOT := $(CWD)
 endif
 
-MAKE_CACHE ?= $(PROJECT_ROOT)/node_modules/.make
-_ACTIONS := $(MAKE_CACHE)/actions
-DONE := $(MAKE_CACHE)/done
-DEPS := $(MAKE_CACHE)/deps
-ACTION := $(DONE)
+CHILD := false
+ifneq ($(PROJECT_ROOT),$(CWD))
+ifeq ($(PARENT),true)
+	CHILD := true
+endif
+endif
+
+export MAKE_CACHE ?= $(CWD)/.env/.make
+export _ACTIONS := $(MAKE_CACHE)/actions
+export DONE := $(MAKE_CACHE)/done
+export DEPS := $(MAKE_CACHE)/deps
+export ACTION := $(DONE)
 
 _RUN := $(shell mkdir -p $(_ACTIONS) $(DEPS) $(DONE))
 
@@ -95,21 +112,38 @@ define clean
 endef
 
 define ACTION_TEMPLATE
-ifneq ($$({{ACTION_UPPER}}_READY),true)
-{{ACTION_UPPER}}_READY := true
-.PHONY: {{ACTION}} +{{ACTION}} _{{ACTION}} ~{{ACTION}}
-{{ACTION}}: _{{ACTION}} ~{{ACTION}}
-~{{ACTION}}: {{ACTION_DEPENDENCY}} $$({{ACTION_UPPER}}_TARGET)
-+{{ACTION}}: _{{ACTION}} $$({{ACTION_UPPER}}_TARGET)
-_{{ACTION}}:
-	@$$(call clear_cache,$$(DONE)/_{{ACTION}})
+ifeq ($$(CHILD),true)
+ifneq ($$(CHILD_{{ACTION_UPPER}}_READY),true)
+CHILD_{{ACTION_UPPER}}_READY = true
+.PHONY: child_{{ACTION}} child_+{{ACTION}} child__{{ACTION}} child_~{{ACTION}}
+child_{{ACTION}}: child__{{ACTION}} child_~{{ACTION}}
+child_~{{ACTION}}: child_{{ACTION_DEPENDENCY}} $$({{ACTION_UPPER}}_TARGET)
+child_+{{ACTION}}: child__{{ACTION}} $$({{ACTION_UPPER}}_TARGET)
+child__{{ACTION}}:
+	@$$(call clear_cache,$$(DONE)/{{ACTION}})
 $$(DONE)/_{{ACTION}}/%: %
 	@$$(call clear_cache,$$(DONE)/{{ACTION}})
 	@$$(call add_dep,{{ACTION}},$$<)
 	@$$(call cache,$$@)
 endif
+else
+ifneq ($$({{ACTION_UPPER}}_READY),true)
+{{ACTION_UPPER}}_READY = true
+.PHONY: {{ACTION}} +{{ACTION}} _{{ACTION}} ~{{ACTION}}
+{{ACTION}}: _{{ACTION}} ~{{ACTION}}
+~{{ACTION}}: {{ACTION_DEPENDENCY}} $$({{ACTION_UPPER}}_TARGET)
++{{ACTION}}: _{{ACTION}} $$({{ACTION_UPPER}}_TARGET)
+_{{ACTION}}:
+	@$$(call clear_cache,$$(DONE)/{{ACTION}})
+$$(DONE)/_{{ACTION}}/%: %
+	@$$(call clear_cache,$$(DONE)/{{ACTION}})
+	@$$(call add_dep,{{ACTION}},$$<)
+	@$$(call cache,$$@)
+endif
+endif
 endef
 
+.PHONY: $(_ACTIONS)/%
 $(_ACTIONS)/%:
 	@ACTION_BLOCK=$(shell echo $@ | $(GREP) -oE '[^\/]+$$') && \
 		ACTION=$$(echo $$ACTION_BLOCK | $(GREP) -oE '^[^~]+') && \
