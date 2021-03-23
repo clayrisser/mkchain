@@ -70,7 +70,7 @@ ifeq ($(PARENT),true)
 endif
 endif
 
-export MAKE_CACHE ?= $(CWD)/.env/.make
+export MAKE_CACHE ?= $(CWD)/.make
 export _ACTIONS := $(MAKE_CACHE)/actions
 export DONE := $(MAKE_CACHE)/done
 export DEPS := $(MAKE_CACHE)/deps
