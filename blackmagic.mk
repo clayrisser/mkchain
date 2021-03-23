@@ -48,9 +48,6 @@ MAKEFLAGS += "-j $(NUMPROC)"
 CWD := $(shell pwd)
 export CD ?= cd
 export GIT ?= $(shell git --version >$(NULL) 2>&1 && echo git|| echo true)
-export VIRTUALENV ?= virtualenv
-export NPM ?= $(shell pnpm --version >$(NULL) 2>&1 && echo pnpm|| (yarn --version >$(NULL) 2>&1 && echo yarn|| echo npm))
-export SERVICEBLEND ?= serviceblend
 export NOFAIL := 2>$(NULL)|| true
 
 .EXPORT_ALL_VARIABLES:
