@@ -66,8 +66,8 @@ export NUMPROC ?= 1
 # MAKEFLAGS += "-j $(NUMPROC)"
 
 export CD ?= cd
-export GIT ?= $(shell git --version >$(NULL) 2>&1 && echo git|| echo true)
-export NPM ?= $(shell pnpm --version >$(NULL) 2>&1 && echo pnpm|| (yarn --version >$(NULL) 2>&1 && echo yarn|| echo npm))
+export GIT ?= $(shell git --version 2>$(NULL) >$(NULL) && ([ -d .git ] && echo git|| echo true)|| echo true)
+export NPM ?= $(shell pnpm --version 2>$(NULL) >$(NULL) && echo pnpm|| (yarn --version 2>$(NULL) >$(NULL) && echo yarn|| echo npm))
 export NOFAIL := 2>$(NULL)|| true
 
 PROJECT_ROOT ?= $(shell $(GIT) rev-parse --show-superproject-working-tree)
