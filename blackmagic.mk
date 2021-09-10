@@ -128,6 +128,10 @@ define reset_envs
 	rm -rf $(ENVS) $(NOFAIL)
 endef
 
+define dotenv
+	export $$(cat $1 | sed 's|^#.*||g' | xargs)
+endef
+
 define ACTION_TEMPLATE
 ifeq ($$(CHILD),true)
 ifneq ($$(CHILD_{{ACTION_UPPER}}_READY),true)
