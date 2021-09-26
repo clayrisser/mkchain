@@ -128,6 +128,18 @@ define reset_envs
 	rm -rf $(ENVS) $(NOFAIL)
 endef
 
+define deepignore
+	-e $(BANG)$1 \
+	-e $(BANG)$1/ \
+	-e $(BANG)$1/**/* \
+	-e $(BANG)/$1 \
+	-e $(BANG)/$1/ \
+	-e $(BANG)/$1/**/* \
+	-e $(BANG)/**/$1 \
+	-e $(BANG)/**/$1/ \
+	-e $(BANG)/**/$1/**/*
+endef
+
 define dotenv
 	export $$(cat $1 | sed 's|^#.*||g' | xargs)
 endef
