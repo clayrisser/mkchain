@@ -24,13 +24,14 @@ export DEPS := $(MAKE_CACHE)/deps
 export DONE := $(MAKE_CACHE)/done
 export ENVS := $(MAKE_CACHE)/envs
 export ACTION := $(DONE)
+export WHICH := command -v
 
 .EXPORT_ALL_VARIABLES:
 
 -include $(ENVS)
 
 export PLATFORM := $(shell node -e "process.stdout.write(process.platform)")
-export NIX_ENV := $(shell which sed | grep -qE "^/nix/store" && echo true|| echo false)
+export NIX_ENV := $(shell $(WHICH) sed | grep -qE "^/nix/store" && echo true|| echo false)
 ifeq ($(PLATFORM),win32)
 	BANG := !
 	MAKE := make
