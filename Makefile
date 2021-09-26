@@ -32,11 +32,11 @@ endif
 
 .PHONY: pack
 pack:
-	@tar -cvzf $(MKPM_NAME).tar.gz -C $(MKPM_NAME) .
+	@tar -cvzf $(MKPM_NAME)/$(MKPM_NAME).tar.gz -C $(MKPM_NAME)/src .
 
 .PHONY: publish
 publish: pack
-	@$(GIT) add $(MKPM_NAME).tar.gz
+	@$(GIT) add $(MKPM_NAME)/$(MKPM_NAME).tar.gz
 	@$(GIT) commit $(MKPM_NAME).tar.gz -m "Publish $(MKPM_NAME) version $(MKPM_VERSION)" $(NOFAIL)
 	@$(GIT) tag $(MKPM_NAME)/$(MKPM_VERSION)
 	@$(GIT) push && $(GIT) push --tags
