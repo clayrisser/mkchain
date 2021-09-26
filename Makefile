@@ -35,7 +35,7 @@ pack:
 	@tar -cvzf $(MKPM_NAME).tar.gz -C $(MKPM_NAME) .
 
 .PHONY: publish
-publish:
+publish: pack
 	@$(GIT) add $(MKPM_NAME).tar.gz
 	@$(GIT) commit $(MKPM_NAME).tar.gz -m "Publish $(MKPM_NAME) version $(MKPM_VERSION)"
 	@$(GIT) tag $(MKPM_NAME)/$(MKPM_VERSION)
