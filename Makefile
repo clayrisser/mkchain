@@ -39,6 +39,7 @@ publish: pack
 	@$(GIT) add $(MKPM_NAME).tar.gz
 	@$(GIT) commit $(MKPM_NAME).tar.gz -m "Publish $(MKPM_NAME) version $(MKPM_VERSION)"
 	@$(GIT) tag $(MKPM_NAME)/$(MKPM_VERSION)
+	@$(GIT) push && $(GIT) push --tags
 
 .PHONY: sudo
 sudo:
