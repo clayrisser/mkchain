@@ -17,7 +17,7 @@
 
 CWD := $(shell pwd)
 export NO_CHECK ?= false
-export MAKE_CACHE ?= $(CWD)/.make
+export MAKE_CACHE ?= $(CWD)/.mkpm/.blackmagic
 export _ACTIONS := $(MAKE_CACHE)/actions
 export CHECK := $(MAKE_CACHE)/check
 export DEPS := $(MAKE_CACHE)/deps

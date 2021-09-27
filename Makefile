@@ -1,8 +1,8 @@
 include blackmagic.mk
+include mkpm.mk
 
-MKPM_NAME := blackmagic
-MKPM_VERSION := 0.0.1
-
+FIND := find
+TMP := $(MKPM)/.tmp
 ACTIONS += hello
 HELLO_DEPS :=
 HELLO_TARGET := $(HELLO_DEPS) $(ACTION)/hello
@@ -32,7 +32,19 @@ endif
 
 .PHONY: pack
 pack:
-	@tar -cvzf $(MKPM_NAME)/$(MKPM_NAME).tar.gz -C $(MKPM_NAME)/src .
+	@rm -rf $(TMP) $(NOFAIL) && mkdir -p $(TMP)
+	@cp main.mk $(TMP)
+	@cp mkpm.mk $(TMP)
+	@cp LICENSE $(TMP) $(NOFAIL)
+	@for f in $(shell [ "$(MKPM_FILES_REGEX)" = "" ] || \
+		$(FIND) . -type f -not -path './.git/*' | $(SED) 's|^\.\/||g' | \
+		$(GREP) -E "$(MKPM_FILES_REGEX)") \
+		$(shell $(GIT) ls-files | $(GREP) -E "^README[^\/]*$$"); do \
+			PARENT_DIR=$$(echo $$f | $(SED) 's|[^\/]\+$$||g' | $(SED) 's|\/$$||g') && \
+			([ "$$PARENT_DIR" != "" ] && mkdir -p $(TMP)/$$PARENT_DIR || true) && \
+			cp $$f $(TMP)/$$f; \
+		done
+	@tar -cvzf $(MKPM_NAME).mkpm.tar.gz -C $(TMP) .
 
 .PHONY: publish
 publish: pack
