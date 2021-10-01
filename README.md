@@ -8,8 +8,6 @@ only the files that updated. This significantly increases the speed of builds
 and development in a language and ecosystem agnostic way without sacrificing
 enforcement of critical scripts and jobs.
 
-## Features
-
 ### Dynamic Batched Dependencies
 
 Traditionally there are two strategies for dealing with dependencies
@@ -40,23 +38,8 @@ lint all of the files any time a single file changes, but again that is
 slower than just linting the files that changed. Using actions, we can
 run the linter once, but only on the dynamic set of dependencies that updated.
 
-### Action chains
+### Action Chains
 
-Actions can depend on other actions forming a chain of operations that are
-efficiently cached.
-
-## Terminology
-
-### Actions
-
-actions are special targets that operate on a batched dynamic set of dependencies
-that updated
-
-### Deps
-
-deps are files that the action tracks and includes in an operation when they are
-updated
-
-### Targets
-
-targets are regular Makefile targets that can be attached to an action
+Actions are special targets that operate on a batched dynamic set of dependencies
+that updated. Actions can depend on other actions forming a chain of operations that
+are efficiently cached.
