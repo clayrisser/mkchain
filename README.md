@@ -1,3 +1,1 @@
-# blackmagic
-
-> just a bit of makefile blackmagic
+    DEPS - main.mk mkpm.mk

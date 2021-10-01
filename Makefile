@@ -1,66 +1,93 @@
-include blackmagic.mk
+# File: /Makefile
+# Project: blackmagic
+# File Created: 26-09-2021 16:53:36
+# Author: Clay Risser
+# -----
+# Last Modified: 30-09-2021 22:01:07
+# Modified By: Clay Risser
+# -----
+# BitSpur Inc (c) Copyright 2021
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 include mkpm.mk
+ifneq (,$(MKPM))
+include main.mk
 
-FIND := find
-TMP := $(MKPM)/.tmp
-ACTIONS += hello
-HELLO_DEPS :=
-HELLO_TARGET := $(HELLO_DEPS) $(ACTION)/hello
-$(ACTION)/hello:
-	@echo world
+PACK_DIR := $(MKPM_TMP)/pack
 
-.PHONY: lfs
-ifeq ($(shell $(GIT) lfs $(NOOUT) && echo true || echo false),true)
-lfs:
-else
-ifeq ($(PLATFORM),linux)
-ifeq ($(FLAVOR),debian)
-lfs: sudo
-	@sudo apt-get install -y git-lfs
-	@git lfs install
-endif
-endif
-ifeq ($(PLATFORM),darwin)
-lfs:
-	@brew install git-lfs
-	@git lfs install
-endif
-endif
-ifneq ($(shell cat .gitattributes 2>$(NULL) | $(GREP) -q '*.tar.gz' $(NOOUT) && echo true || echo false),true)
-	@$(GIT) lfs track "*.tar.gz"
-endif
+.PHONY: zero
+zero: ;
+
+ACTIONS += one
+ONE_TARGETS := zero
+$(ACTION)/one:
+	@echo one
+	@$(call done,one)
+
+ACTIONS += two~one
+TWO_DEPS := $(call git_deps,two,\.((mk)|(md))$$)
+$(ACTION)/two:
+	@echo two
+	@$(call done,two)
+
+ACTIONS += three~two
+$(ACTION)/three:
+	@echo three
+	@$(call done,three)
+
+.PHONY: info
+info:
+	@echo IS_PROJECT_ROOT: $(IS_PROJECT_ROOT)
+	@echo PROJECT_ROOT: $(PROJECT_ROOT)
+	@echo ROOT: $(ROOT)
 
 .PHONY: pack
 pack:
-	@rm -rf $(TMP) $(NOFAIL) && mkdir -p $(TMP)
-	@cp main.mk $(TMP)
-	@cp mkpm.mk $(TMP)
-	@cp LICENSE $(TMP) $(NOFAIL)
+	@rm -rf $(PACK_DIR) $(NOFAIL) && mkdir -p $(PACK_DIR)
+	@cp main.mk $(PACK_DIR)
+	@cp mkpm.mk $(PACK_DIR)
+	@cp LICENSE $(PACK_DIR) $(NOFAIL)
 	@for f in $(shell [ "$(MKPM_FILES_REGEX)" = "" ] || \
 		$(FIND) . -type f -not -path './.git/*' | $(SED) 's|^\.\/||g' | \
 		$(GREP) -E "$(MKPM_FILES_REGEX)") \
 		$(shell $(GIT) ls-files | $(GREP) -E "^README[^\/]*$$"); do \
 			PARENT_DIR=$$(echo $$f | $(SED) 's|[^\/]\+$$||g' | $(SED) 's|\/$$||g') && \
-			([ "$$PARENT_DIR" != "" ] && mkdir -p $(TMP)/$$PARENT_DIR || true) && \
-			cp $$f $(TMP)/$$f; \
+			([ "$$PARENT_DIR" != "" ] && mkdir -p $(PACK_DIR)/$$PARENT_DIR || true) && \
+			cp $$f $(PACK_DIR)/$$f; \
 		done
-	@tar -cvzf $(MKPM_NAME).mkpm.tar.gz -C $(TMP) .
+	@tar -cvzf $(MKPM_PKG_NAME).tar.gz -C $(PACK_DIR) .
 
 .PHONY: publish
 publish: pack
-	@$(GIT) add $(MKPM_NAME)/$(MKPM_NAME).tar.gz
-	@$(GIT) commit $(MKPM_NAME).tar.gz -m "Publish $(MKPM_NAME) version $(MKPM_VERSION)" $(NOFAIL)
-	@$(GIT) tag $(MKPM_NAME)/$(MKPM_VERSION)
-	@$(GIT) push && $(GIT) push --tags
 
 .PHONY: sudo
 sudo:
 	@sudo true
 
--include $(patsubst %,$(_ACTIONS)/%,$(ACTIONS))
+.PHONY: clean
+clean:
+	@$(BLACKMAGIC_CLEAN)
+	@$(GIT) clean -fXd \
+		$(MKPM_GIT_CLEAN_FLAGS)
 
-+%:
-	@$(MAKE) -e -s $(shell echo $@ | $(SED) 's/^\+//g')
+.PHONY: purge
+purge: clean
+	@$(GIT) clean -fXd
 
-%:
-	@echo $@ is not a valid command && exit 1
+-include $(call actions)
+
+endif
+
+INSTALL_DEPS_SCRIPT += && \
+	true
