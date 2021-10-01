@@ -4,6 +4,7 @@
     "cloc",
     "gnumake",
     "gnused",
+    "makefiles",
     "mkpm",
     "nixpkgs",
     "stdenv"

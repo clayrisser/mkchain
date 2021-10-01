@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 30-09-2021 21:56:13
+# Last Modified: 01-10-2021 02:34:51
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -163,7 +163,7 @@ $(_DONE)/_:
 	@$(call touch,$@)
 
 -include $(_ENVS)
-$(_ENVS): $(PROJECT_ROOT)/main.mk $(ROOT)/Makefile
+$(_ENVS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(ROOT),Makefile)
 	@$(ECHO) 🗲  make will be faster next time
 	@$(call rm_rf,$@) $(NOFAIL)
 # POSIX >>>
@@ -173,7 +173,7 @@ $(_ENVS): $(PROJECT_ROOT)/main.mk $(ROOT)/Makefile
 # <<< POSIX
 
 -include $(_INSTALL_DEPS)
-$(_INSTALL_DEPS): $(PROJECT_ROOT)/main.mk $(ROOT)/Makefile
+$(_INSTALL_DEPS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(ROOT),Makefile)
 	@$(call ensure_parent_dir,$(_INSTALL_DEPS))
 ifneq ($(NO_INSTALL_DEPS),true)
 	@$(ECHO) 🔌 installing dependencies
