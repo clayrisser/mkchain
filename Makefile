@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 02-10-2021 02:34:09
+# Last Modified: 02-10-2021 03:19:51
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -36,21 +36,26 @@ $(ACTION)/one:
 	@$(call done,one)
 
 ACTIONS += two~one
-TWO_DEPS := $(call git_deps,two,\.((mk)|(md))$$)
-$(ACTION)/two:
+$(ACTION)/two: $(call git_deps,two,\.((mk)|(md))$$)
 	@echo two
+	@echo $?
 	@$(call done,two)
 
 ACTIONS += three~two
 $(ACTION)/three:
 	@echo three
+	@$(MAKE) -s -C sub sub_three
 	@$(call done,three)
 
 .PHONY: info
 info:
 	@echo IS_PROJECT_ROOT: $(IS_PROJECT_ROOT)
+	@echo IS_SUB: $(IS_SUB)
+	@echo CURDIR: $(CURDIR)
 	@echo PROJECT_ROOT: $(PROJECT_ROOT)
 	@echo ROOT: $(ROOT)
+	@echo
+	@$(MAKE) -s -C sub info
 
 .PHONY: pack
 pack:
@@ -91,18 +96,3 @@ endif
 
 INSTALL_DEPS_SCRIPT += && \
 	true
-
-
-
-
-
-
-two: _two ~two
-~two: ~one $(ACTION)/two
-+two: _two $(ACTION)/two
-_two:
-	@rm -rf $(ACTION)/two
-$(ACTION)/two: hello.js world.js
-	@echo $?
-	@touch -m $@
-

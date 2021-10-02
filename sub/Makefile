@@ -3,7 +3,7 @@
 # File Created: 01-10-2021 01:51:21
 # Author: Clay Risser
 # -----
-# Last Modified: 01-10-2021 02:36:39
+# Last Modified: 02-10-2021 03:17:32
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -34,9 +34,9 @@ $(ACTION)/one:
 	@$(call done,one)
 
 ACTIONS += two~one
-TWO_DEPS := $(call git_deps,two,\.((mk)|(md))$$)
-$(ACTION)/two:
+$(ACTION)/two: Makefile
 	@echo two
+	@echo $?
 	@$(call done,two)
 
 ACTIONS += three~two
@@ -47,6 +47,8 @@ $(ACTION)/three:
 .PHONY: info
 info:
 	@echo IS_PROJECT_ROOT: $(IS_PROJECT_ROOT)
+	@echo IS_SUB: $(IS_SUB)
+	@echo CURDIR: $(CURDIR)
 	@echo PROJECT_ROOT: $(PROJECT_ROOT)
 	@echo ROOT: $(ROOT)
 
