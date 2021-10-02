@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 01-10-2021 02:34:51
+# Last Modified: 02-10-2021 02:19:37
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -38,6 +38,8 @@
 #
 # - Clay Risser
 
+.NOTPARALLEL:
+
 export NO_INSTALL_DEPS ?= false
 export BLACKMAGIC_CACHE ?= $(MKPM_TMP)/blackmagic
 export _ACTIONS := $(BLACKMAGIC_CACHE)/actions
@@ -56,9 +58,13 @@ TR ?= tr
 
 export GIT ?= $(call ternary,git --version,git,true)
 
-IS_PROJECT_ROOT := false
-ifeq ($(PROJECT_ROOT),$(ROOT))
-	IS_PROJECT_ROOT := true
+IS_PROJECT_ROOT := true
+IS_SUB := false
+ifneq ($(PROJECT_ROOT),$(ROOT))
+	IS_PROJECT_ROOT := false
+endif
+ifneq ($(ROOT),$(shell pwd))
+	IS_PROJECT_ROOT := false
 endif
 
 export BLACKMAGIC_CLEAN := $(call rm_rf,$(BLACKMAGIC_CACHE)) $(NOFAIL)
@@ -101,9 +107,11 @@ endef
 
 # POSIX >>>
 define _ACTION_TEMPLATE
+ifeq ($$(IS_PROJECT_ROOT),true)
 ifneq ($$({{ACTION_UPPER}}_READY),true)
 {{ACTION_UPPER}}_READY = true
 .PHONY: {{ACTION}} +{{ACTION}} _{{ACTION}} ~{{ACTION}} .{{ACTION}} ._{{ACTION}}
+.DELETE_ON_ERROR: $$(ACTION)/{{ACTION}}
 {{ACTION}}: _{{ACTION}} ~{{ACTION}}
 ~{{ACTION}}: | {{ACTION_DEPENDENCY}} $$({{ACTION_UPPER}}_DEPS) \
 	$$({{ACTION_UPPER}}_TARGETS) $$(ACTION)/{{ACTION}}
@@ -119,9 +127,28 @@ $$(_DONE)/_{{ACTION}}/%: %
 	@$$(call cache,$$@)
 .{{ACTION}}: | _{{ACTION}} $$({{ACTION_UPPER}}_DEPS)
 	@echo {{ACTION}}$$$$(echo {{ACTION_DEPENDENCY}} | $(SED) "s|^~| \< |g"): $$({{ACTION_UPPER}}_TARGETS)
-	@[ "$$(call get_deps,two)" = "" ] && true || \
-		(printf "    " && (echo $$(call get_deps,two) | $(SED) "s| |\\n    |g"))
-	@$$(call done,two)
+	@[ "$$(call get_deps,{{ACTION}})" = "" ] && true || \
+		(printf "    " && (echo $$(call get_deps,{{ACTION}}) | $(SED) "s| |\\n    |g"))
+	@$$(call done,{{ACTION}})
+endif
+else
+ifneq ($$({{ACTION_UPPER}}_READY),true)
+SUB_{{ACTION_UPPER}}_READY = true
+.PHONY: sub_{{ACTION}} sub_+{{ACTION}} sub__{{ACTION}} sub_~{{ACTION}}
+sub_{{ACTION}}: sub__{{ACTION}} sub_~{{ACTION}}
+sub_~{{ACTION}}: | {{SUB_ACTION_DEPENDENCY}} $$({{ACTION_UPPER}}_DEPS) \
+	$$({{ACTION_UPPER}}_TARGETS) $$(ACTION)/{{ACTION}}
+sub_+{{ACTION}}: | sub__{{ACTION}} $$({{ACTION_UPPER}}_DEPS) \
+	$$({{ACTION_UPPER}}_TARGETS) $$(ACTION)/{{ACTION}}
+_{{ACTION}}:
+	@$$(call touch_m,$$(_DONE)/+{{ACTION}})
+	@$$(call clear_cache,$$(_DONE)/_{{ACTION}})
+	@$$(call clear_cache,$$(_DONE)/{{ACTION}})
+$$(_DONE)/_{{ACTION}}/%: %
+	@$$(call clear_cache,$$(_DONE)/{{ACTION}})
+	@$$(call add_dep,{{ACTION}},$$<)
+	@$$(call cache,$$@)
+endif
 endif
 endef
 # <<< POSIX
@@ -130,36 +157,28 @@ define actions
 $(patsubst %,$(_ACTIONS)/%,$(ACTIONS))
 endef
 
-define parent_dir
-$(shell $(ECHO) $1 | $(SED) -E "s|\/[^\/]*$$||g")
-endef
-
-define ensure_parent_dir
-$(call mkdir_p,$(call parent_dir,$1))
-endef
-
 .PHONY: $(_ACTIONS)/%
 $(_ACTIONS)/%:
-	@$(call ensure_parent_dir,$@)
+	@$(call mkdir_p,$(@D))
 # POSIX >>>
 	@ACTION_BLOCK=$(shell $(ECHO) $@ | $(GREP) -oE "[^\/]+$$") && \
 		ACTION=$$($(ECHO) $$ACTION_BLOCK | $(GREP) -oE "^[^~]+") && \
 		ACTION_DEPENDENCY=$$($(ECHO) $$ACTION_BLOCK | $(GREP) -Eo "~[^~]+$$" $(NOFAIL)) && \
-		CHILD_ACTION_DEPENDENCY=$$([ "$$ACTION_DEPENDENCY" = "" ] && $(ECHO) "" || $(ECHO) "child_$$ACTION_DEPENDENCY") && \
+		SUB_ACTION_DEPENDENCY=$$([ "$$ACTION_DEPENDENCY" = "" ] && $(ECHO) "" || $(ECHO) "sub_$$ACTION_DEPENDENCY") && \
 		ACTION_UPPER=$$($(ECHO) $$ACTION | $(TR) '[:lower:]' '[:upper:]') && \
 		$(ECHO) "$${_ACTION_TEMPLATE}" | $(SED) "s|{{ACTION}}|$${ACTION}|g" | \
 		$(SED) "s|{{ACTION_DEPENDENCY}}|$${ACTION_DEPENDENCY}|g" | \
-		$(SED) "s|{{CHILD_ACTION_DEPENDENCY}}|$${CHILD_ACTION_DEPENDENCY}|g" | \
+		$(SED) "s|{{SUB_ACTION_DEPENDENCY}}|$${SUB_ACTION_DEPENDENCY}|g" | \
 		$(SED) "s|{{ACTION_UPPER}}|$${ACTION_UPPER}|g" > $@
 # <<< POSIX
 
 -include $(_DEPS)/_
 $(_DEPS)/_:
-	@$(call mkdir_p,$(_DEPS))
+	@$(call mkdir_p,$(@D))
 	@$(call touch,$@)
 -include $(_DONE)/_
 $(_DONE)/_:
-	@$(call mkdir_p,$(_DONE))
+	@$(call mkdir_p,$(@D))
 	@$(call touch,$@)
 
 -include $(_ENVS)
@@ -174,15 +193,14 @@ $(_ENVS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(ROOT),Mak
 
 -include $(_INSTALL_DEPS)
 $(_INSTALL_DEPS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(ROOT),Makefile)
-	@$(call ensure_parent_dir,$(_INSTALL_DEPS))
 ifneq ($(NO_INSTALL_DEPS),true)
 	@$(ECHO) 🔌 installing dependencies
 	@$(TRUE) $(INSTALL_DEPS_SCRIPT)
 	@$(BLACKMAGIC_CLEAN)
 	@$(ECHO) 💣 busted cache
 endif
-	@$(call ensure_parent_dir,$(_INSTALL_DEPS))
-	@$(call touch_m,$(_INSTALL_DEPS))
+	@$(call mkdir_p,$(@D))
+	@$(call touch_m,$(@))
 
 CACHE_ENVS += \
 	GIT

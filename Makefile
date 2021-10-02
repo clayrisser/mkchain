@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 01-10-2021 02:35:48
+# Last Modified: 02-10-2021 02:34:09
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -91,3 +91,18 @@ endif
 
 INSTALL_DEPS_SCRIPT += && \
 	true
+
+
+
+
+
+
+two: _two ~two
+~two: ~one $(ACTION)/two
++two: _two $(ACTION)/two
+_two:
+	@rm -rf $(ACTION)/two
+$(ACTION)/two: hello.js world.js
+	@echo $?
+	@touch -m $@
+
