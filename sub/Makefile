@@ -3,7 +3,7 @@
 # File Created: 01-10-2021 01:51:21
 # Author: Clay Risser
 # -----
-# Last Modified: 02-10-2021 03:17:32
+# Last Modified: 02-10-2021 09:59:02
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -47,7 +47,7 @@ $(ACTION)/three:
 .PHONY: info
 info:
 	@echo IS_PROJECT_ROOT: $(IS_PROJECT_ROOT)
-	@echo IS_SUB: $(IS_SUB)
+	@echo MAKELEVEL: $(MAKELEVEL)
 	@echo CURDIR: $(CURDIR)
 	@echo PROJECT_ROOT: $(PROJECT_ROOT)
 	@echo ROOT: $(ROOT)
