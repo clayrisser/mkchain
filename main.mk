@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 03-10-2021 16:05:09
+# Last Modified: 03-10-2021 16:42:56
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -67,7 +67,7 @@ $(call mkdir_p,$(shell echo $1 | $(SED) 's|\/[^\/]*$$||g')) && \
 endef
 
 define git_deps
-$(shell $(GIT) ls-files 2>$(NULL) | $(GREP) -E "$2" $(NOFAIL))
+$(shell $(GIT) ls-files 2>$(NULL) | $(GREP) -E "$1" $(NOFAIL))
 endef
 
 define _ACTION_TEMPLATE
