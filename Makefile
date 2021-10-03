@@ -1,9 +1,9 @@
 # File: /Makefile
-# Project: blackmagic
+# Project: mkchain
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 02-10-2021 10:00:31
+# Last Modified: 03-10-2021 16:04:06
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -82,7 +82,7 @@ sudo:
 
 .PHONY: clean
 clean:
-	@$(BLACKMAGIC_CLEAN)
+	@$(MKCHAIN_CLEAN)
 	@$(GIT) clean -fXd \
 		$(MKPM_GIT_CLEAN_FLAGS)
 

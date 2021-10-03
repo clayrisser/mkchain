@@ -1,9 +1,9 @@
 # File: /mkpm.mk
-# Project: blackmagic
+# Project: mkchain
 # File Created: 27-09-2021 16:33:44
 # Author: Clay Risser
 # -----
-# Last Modified: 30-09-2021 17:23:48
+# Last Modified: 03-10-2021 16:04:29
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -20,9 +20,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MKPM_PKG_NAME := blackmagic
+MKPM_PKG_NAME := mkchain
 
-MKPM_PKG_DESCRIPTION := "just a bit of makefile blackmagic"
+MKPM_PKG_DESCRIPTION := "chained actions for makefiles"
 
 MKPM_PKG_VERSION := 0.0.1
 

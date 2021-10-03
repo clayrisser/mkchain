@@ -1,10 +1,10 @@
 {
   "cSpell.words": [
-    "blackmagic",
     "cloc",
     "gnumake",
     "gnused",
     "makefiles",
+    "mkchain",
     "mkpm",
     "nixpkgs",
     "stdenv"

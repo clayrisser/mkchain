@@ -1,9 +1,9 @@
 # File: /main.mk
-# Project: blackmagic
+# Project: mkchain
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 02-10-2021 09:58:52
+# Last Modified: 03-10-2021 16:05:09
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -21,8 +21,6 @@
 # limitations under the License.
 # -----
 #
-# just a bit of black magic
-#
 # the magic of this makefile consists of functions and macros
 # used to create complex cached dependency chains that track
 # changes on individual files and works across unix environments
@@ -33,19 +31,15 @@
 # this significantly increases the speed of builds and development in a
 # language and ecosystem agnostic way without sacrificing enforcement of
 # critical scripts and jobs
-#
-# an explanation of how this works is beyond the scope of this header
-#
-# - Clay Risser
 
 .NOTPARALLEL:
 
 export NO_INSTALL_DEPS ?= false
-_BLACKMAGIC_CACHE ?= $(MKPM_TMP)/blackmagic
-_ACTIONS := $(_BLACKMAGIC_CACHE)/actions
-_INSTALL_DEPS := $(_BLACKMAGIC_CACHE)/install_deps
-_DONE := $(_BLACKMAGIC_CACHE)/done
-_ENVS := $(_BLACKMAGIC_CACHE)/envs
+_MKCACHE_CACHE ?= $(MKPM_TMP)/mkchain
+_ACTIONS := $(_MKCACHE_CACHE)/actions
+_INSTALL_DEPS := $(_MKCACHE_CACHE)/install_deps
+_DONE := $(_MKCACHE_CACHE)/done
+_ENVS := $(_MKCACHE_CACHE)/envs
 ACTION := $(_DONE)
 
 export CD ?= cd
@@ -60,8 +54,8 @@ ifeq ($(ROOT),$(PROJECT_ROOT))
 	IS_PROJECT_ROOT := true
 endif
 
-export BLACKMAGIC_CLEAN := $(call rm_rf,$(_BLACKMAGIC_CACHE)) $(NOFAIL)
-export BLACKMAGIC_RESET_ENVS := $(call rm_rf,$(_ENVS)) $(NOFAIL)
+export MKCACHE_CLEAN := $(call rm_rf,$(_MKCACHE_CACHE)) $(NOFAIL)
+export MKCACHE_RESET_ENVS := $(call rm_rf,$(_ENVS)) $(NOFAIL)
 
 define done
 $(call touch_m,$(_DONE)/$1)
@@ -126,7 +120,7 @@ $(_INSTALL_DEPS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(R
 ifneq ($(NO_INSTALL_DEPS),true)
 	@$(ECHO) 🔌 installing dependencies
 	@$(TRUE) $(INSTALL_DEPS_SCRIPT)
-	@$(BLACKMAGIC_CLEAN)
+	@$(MKCACHE_CLEAN)
 	@$(ECHO) 💣 busted cache
 endif
 	@$(call mkdir_p,$(@D))
