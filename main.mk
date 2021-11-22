@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 03-10-2021 16:42:56
+# Last Modified: 22-11-2021 02:41:19
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -83,6 +83,11 @@ export _ACTION_TEMPLATE
 
 define actions
 $(patsubst %,$(_ACTIONS)/%,$(ACTIONS))
+endef
+
+define reset
+$(MAKE) -s _$1 && \
+$(call rm_rf,$(ACTION)/$1) $(NOFAIL)
 endef
 
 .PHONY: $(_ACTIONS)/%
