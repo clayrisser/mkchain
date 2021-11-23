@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 22-11-2021 02:41:19
+# Last Modified: 23-11-2021 07:21:32
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -137,3 +137,17 @@ export CACHE_ENVS += \
 .PHONY: +%
 +%:
 	@$(MAKE) -s $(shell echo $@ | $(SED) 's|^\+||g')
+
+HELP_PREFIX ?=
+HELP_SPACING ?= 32
+MKCHAIN_HELP := _mkchain_help
+$(MKCHAIN_HELP):
+ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
+	@$(MAKE) -s $(HELP)
+	@$(CAT) $(CURDIR)/Makefile | \
+		$(GREP) -E '^ACTIONS\s+\+=\s+[a-zA-Z0-9].*##' | \
+		$(SED) 's|^ACTIONS\s\++=\s\+||g' | \
+		$(SED) 's|~[^ 	]\+||' | \
+		$(SORT) | \
+		$(AWK) 'BEGIN {FS = "[ 	]+##[ 	]*"}; {printf "\033[36m%-$(HELP_SPACING)s  \033[0m%s\n", "$(HELP_PREFIX)"$$1, $$2}'
+endif
