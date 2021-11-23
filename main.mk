@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 23-11-2021 07:21:32
+# Last Modified: 23-11-2021 09:14:03
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -149,5 +149,10 @@ ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
 		$(SED) 's|^ACTIONS\s\++=\s\+||g' | \
 		$(SED) 's|~[^ 	]\+||' | \
 		$(SORT) | \
+		$(UNIQ) | \
 		$(AWK) 'BEGIN {FS = "[ 	]+##[ 	]*"}; {printf "\033[36m%-$(HELP_SPACING)s  \033[0m%s\n", "$(HELP_PREFIX)"$$1, $$2}'
+endif
+
+ifeq (,$(DEFAULT_GOAL))
+.DEFAULT_GOAL := $(MKCHAIN_HELP)
 endif
