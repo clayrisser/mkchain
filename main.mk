@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 03:19:30
+# Last Modified: 04-12-2021 04:20:26
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -146,5 +146,6 @@ ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
 endif
 
 ifeq ($(HELP),$(.DEFAULT_GOAL))
+HELP = $(MKCHAIN_HELP)
 .DEFAULT_GOAL = $(MKCHAIN_HELP)
 endif

@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 02:13:20
+# Last Modified: 04-12-2021 04:19:43
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -89,6 +89,3 @@ purge: clean
 -include $(call actions)
 
 endif
-
-INSTALL_DEPS_SCRIPT += && \
-	true
