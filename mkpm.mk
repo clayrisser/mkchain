@@ -3,7 +3,7 @@
 # File Created: 27-09-2021 16:33:44
 # Author: Clay Risser
 # -----
-# Last Modified: 23-11-2021 09:44:03
+# Last Modified: 04-12-2021 01:28:44
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -22,7 +22,7 @@
 
 MKPM_PKG_NAME := mkchain
 
-MKPM_PKG_VERSION := 0.0.6
+MKPM_PKG_VERSION := 0.0.7
 
 MKPM_PKG_DESCRIPTION := "chained actions for makefiles"
 
@@ -46,10 +46,10 @@ ifeq ($(OS),Windows_NT)
 endif
 -include .mkpm/.bootstrap.mk
 .mkpm/.bootstrap.mk:
-	@mkdir .mkpm 2>$(NULL) || $(TRUE)
-	@cd .mkpm && \
+	@mkdir $(@D) 2>$(NULL) || $(TRUE)
+	@cd $(@D) && \
 		$(shell curl --version >$(NULL) 2>$(NULL) && \
 			echo curl -L -o || \
 			echo wget --content-on-error -O) \
-		.bootstrap.mk $(MKPM_BOOTSTRAP) >$(NULL)
+		$(@F) $(MKPM_BOOTSTRAP) >$(NULL)
 ############## MKPM BOOTSTRAP SCRIPT END ##############

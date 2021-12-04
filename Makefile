@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 03-10-2021 16:04:06
+# Last Modified: 04-12-2021 02:13:20
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -21,8 +21,8 @@
 # limitations under the License.
 
 include mkpm.mk
-ifneq (,$(MKPM))
 include main.mk
+ifneq (,$(MKPM_READY))
 
 PACK_DIR := $(MKPM_TMP)/pack
 
@@ -75,10 +75,6 @@ pack:
 
 .PHONY: publish
 publish: pack
-
-.PHONY: sudo
-sudo:
-	@sudo true
 
 .PHONY: clean
 clean:

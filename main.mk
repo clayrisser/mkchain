@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 23-11-2021 09:43:56
+# Last Modified: 04-12-2021 02:14:15
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -34,10 +34,8 @@
 
 .NOTPARALLEL:
 
-export NO_INSTALL_DEPS ?= false
 _MKCACHE_CACHE ?= $(MKPM_TMP)/mkchain
 _ACTIONS := $(_MKCACHE_CACHE)/actions
-_INSTALL_DEPS := $(_MKCACHE_CACHE)/install_deps
 _DONE := $(_MKCACHE_CACHE)/done
 _ENVS := $(_MKCACHE_CACHE)/envs
 ACTION := $(_DONE)
@@ -93,7 +91,7 @@ endef
 .PHONY: $(_ACTIONS)/%
 $(_ACTIONS)/%:
 	@$(call mkdir_p,$(@D))
-# POSIX >>>
+ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
 	@ACTION_BLOCK=$(shell $(ECHO) $@ | $(GREP) -oE "[^\/]+$$") && \
 		ACTION=$$($(ECHO) $$ACTION_BLOCK | $(GREP) -oE "^[^~]+") && \
 		ACTION_DEPENDENCY=$$($(ECHO) $$ACTION_BLOCK | $(GREP) -Eo "~[^~]+$$" $(NOFAIL)) && \
@@ -103,33 +101,27 @@ $(_ACTIONS)/%:
 		$(SED) "s|{{ACTION_DEPENDENCY}}|$${ACTION_DEPENDENCY}|g" | \
 		$(SED) "s|{{SUB_ACTION_DEPENDENCY}}|$${SUB_ACTION_DEPENDENCY}|g" | \
 		$(SED) "s|{{ACTION_UPPER}}|$${ACTION_UPPER}|g" > $@
-# <<< POSIX
+endif
 
 -include $(_DONE)/_
 $(_DONE)/_:
 	@$(call mkdir_p,$(@D))
 	@$(call touch,$@)
 
+ifneq ($(_ENVS),/mkchain/envs)
 -include $(_ENVS)
-$(_ENVS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(ROOT),Makefile)
+ifneq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
+$(_ENVS): ;
+	@$(TOUCH) $(_ENVS)
+else
+$(_ENVS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(ROOT),Makefile) $(GLOBAL_MK) $(LOCAL_MK)
 	@$(ECHO) 🗲  make will be faster next time
 	@$(call rm_rf,$@) $(NOFAIL)
-# POSIX >>>
 	@$(call for,e,$$CACHE_ENVS) \
 			$(ECHO) "export $(call for_i,e) := $$(eval "echo \$$$(call for_i,e)")" >> $(_ENVS) \
 		$(call for_end)
-# <<< POSIX
-
--include $(_INSTALL_DEPS)
-$(_INSTALL_DEPS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(ROOT),Makefile)
-ifneq ($(NO_INSTALL_DEPS),true)
-	@$(ECHO) 🔌 installing dependencies
-	@$(TRUE) $(INSTALL_DEPS_SCRIPT)
-	@$(MKCACHE_CLEAN)
-	@$(ECHO) 💣 busted cache
 endif
-	@$(call mkdir_p,$(@D))
-	@$(call touch_m,$(@))
+endif
 
 export CACHE_ENVS += \
 	GIT
