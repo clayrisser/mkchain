@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 05:29:59
+# Last Modified: 04-12-2021 05:35:26
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -39,12 +39,6 @@ _ACTIONS := $(_MKCACHE_CACHE)/actions
 _DONE := $(_MKCACHE_CACHE)/done
 _ENVS := $(_MKCACHE_CACHE)/envs
 ACTION := $(_DONE)
-
-export AWK ?= awk
-export CUT ?= cut
-export SORT ?= sort
-export TR ?= tr
-export UNIQ ?= uniq
 
 export GIT ?= $(call ternary,git --version,git,true)
 
