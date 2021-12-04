@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 02:14:15
+# Last Modified: 04-12-2021 03:19:30
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -132,7 +132,7 @@ export CACHE_ENVS += \
 
 HELP_PREFIX ?=
 HELP_SPACING ?= 32
-MKCHAIN_HELP := _mkchain_help
+export MKCHAIN_HELP := _mkchain_help
 $(MKCHAIN_HELP):
 ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
 	@$(MAKE) -s $(HELP)
@@ -146,5 +146,5 @@ ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
 endif
 
 ifeq ($(HELP),$(.DEFAULT_GOAL))
-.DEFAULT_GOAL := $(MKCHAIN_HELP)
+.DEFAULT_GOAL = $(MKCHAIN_HELP)
 endif
