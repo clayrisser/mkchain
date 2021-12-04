@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 04:40:36
+# Last Modified: 04-12-2021 05:04:12
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -114,7 +114,7 @@ ifneq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
 $(_ENVS): ;
 	@$(TOUCH) $(_ENVS)
 else
-$(_ENVS): $(call join_path,$(PROJECT_ROOT),main.mk) $(call join_path,$(ROOT),Makefile) $(GLOBAL_MK) $(LOCAL_MK)
+$(_ENVS): $(call join_path,$(PROJECT_ROOT),mkpm.mk) $(call join_path,$(ROOT),Makefile) $(GLOBAL_MK) $(LOCAL_MK)
 	@$(ECHO) 🗲  make will be faster next time
 	@$(call rm_rf,$@) $(NOFAIL)
 	@$(call for,e,$$CACHE_ENVS) \
