@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 05:04:12
+# Last Modified: 04-12-2021 05:29:59
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -40,10 +40,11 @@ _DONE := $(_MKCACHE_CACHE)/done
 _ENVS := $(_MKCACHE_CACHE)/envs
 ACTION := $(_DONE)
 
-export CD ?= cd
+export AWK ?= awk
 export CUT ?= cut
-export ECHO ?= echo
+export SORT ?= sort
 export TR ?= tr
+export UNIQ ?= uniq
 
 export GIT ?= $(call ternary,git --version,git,true)
 
@@ -118,8 +119,10 @@ $(_ENVS): $(call join_path,$(PROJECT_ROOT),mkpm.mk) $(call join_path,$(ROOT),Mak
 	@$(ECHO) 🗲  make will be faster next time
 	@$(call rm_rf,$@) $(NOFAIL)
 	@$(call for,e,$$CACHE_ENVS) \
-			$(ECHO) "export $(call for_i,e) := $$(eval "echo \$$$(call for_i,e)")" >> $(_ENVS) \
-		$(call for_end)
+		if [ "$$($(ECHO) $$(eval "echo \$$$(call for_i,e)") | $(AWK) '{$$1=$$1};1')" != "" ]; then \
+			$(ECHO) "export $(call for_i,e) := $$(eval "echo \$$$(call for_i,e)")" >> $(_ENVS); \
+		fi \
+	$(call for_end)
 endif
 endif
 
