@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 04:33:50
+# Last Modified: 04-12-2021 04:40:36
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -135,7 +135,7 @@ HELP_SPACING ?= 32
 export MKCHAIN_HELP := _mkchain_help
 $(MKCHAIN_HELP):
 ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
-	@$(MAKE) -s help >$(NULL) || $(TRUE)
+	@$(MAKE) -s $(MKPM_HELP) >$(NULL) || $(TRUE)
 	@$(CAT) $(CURDIR)/Makefile | \
 		$(GREP) -E '^ACTIONS\s+\+=\s+[a-zA-Z0-9].*##' | \
 		$(SED) 's|^ACTIONS\s\++=\s\+||g' | \
@@ -145,6 +145,9 @@ ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
 		$(AWK) 'BEGIN {FS = "[ 	]+##[ 	]*"}; {printf "\033[36m%-$(HELP_SPACING)s  \033[0m%s\n", "$(HELP_PREFIX)"$$1, $$2}'
 endif
 
-ifeq ($(HELP),$(.DEFAULT_GOAL))
+ifeq ($(MKPM_HELP),$(HELP))
+HELP = $(MKCHAIN_HELP)
+endif
+ifeq ($(MKPM_HELP),$(.DEFAULT_GOAL))
 .DEFAULT_GOAL = $(MKCHAIN_HELP)
 endif
