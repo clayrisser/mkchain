@@ -22,7 +22,7 @@
 
 MKPM_PKG_NAME := mkchain
 
-MKPM_PKG_VERSION := 0.0.14
+MKPM_PKG_VERSION := 0.0.15
 
 MKPM_PKG_DESCRIPTION := "chained actions for makefiles"
 
