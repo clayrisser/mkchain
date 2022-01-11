@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 05:35:26
+# Last Modified: 11-01-2022 03:23:28
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -37,7 +37,6 @@
 _MKCACHE_CACHE ?= $(MKPM_TMP)/mkchain
 _ACTIONS := $(_MKCACHE_CACHE)/actions
 _DONE := $(_MKCACHE_CACHE)/done
-_ENVS := $(_MKCACHE_CACHE)/envs
 ACTION := $(_DONE)
 
 export GIT ?= $(call ternary,git --version,git,true)
@@ -48,7 +47,6 @@ ifeq ($(ROOT),$(PROJECT_ROOT))
 endif
 
 export MKCACHE_CLEAN := $(call rm_rf,$(_MKCACHE_CACHE)) $(NOFAIL)
-export MKCACHE_RESET_ENVS := $(call rm_rf,$(_ENVS)) $(NOFAIL)
 
 define done
 $(call touch_m,$(_DONE)/$1)
@@ -102,26 +100,6 @@ endif
 $(_DONE)/_:
 	@$(call mkdir_p,$(@D))
 	@$(call touch,$@)
-
-ifneq ($(_ENVS),/mkchain/envs)
--include $(_ENVS)
-ifneq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
-$(_ENVS): ;
-	@$(TOUCH) $(_ENVS)
-else
-$(_ENVS): $(call join_path,$(PROJECT_ROOT),mkpm.mk) $(call join_path,$(ROOT),Makefile) $(GLOBAL_MK) $(LOCAL_MK)
-	@$(ECHO) 🗲  make will be faster next time
-	@$(call rm_rf,$@) $(NOFAIL)
-	@$(call for,e,$$CACHE_ENVS) \
-		if [ "$$($(ECHO) $$(eval "echo \$$$(call for_i,e)") | $(AWK) '{$$1=$$1};1')" != "" ]; then \
-			$(ECHO) "export $(call for_i,e) := $$(eval "echo \$$$(call for_i,e)")" >> $(_ENVS); \
-		fi \
-	$(call for_end)
-endif
-endif
-
-export CACHE_ENVS += \
-	GIT
 
 .PHONY: +%
 +%:
