@@ -3,7 +3,7 @@
 # File Created: 27-09-2021 16:33:44
 # Author: Clay Risser
 # -----
-# Last Modified: 11-01-2022 03:27:19
+# Last Modified: 04-02-2022 05:33:54
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -22,7 +22,7 @@
 
 MKPM_PKG_NAME := mkchain
 
-MKPM_PKG_VERSION := 0.0.15
+MKPM_PKG_VERSION := 0.0.16
 
 MKPM_PKG_DESCRIPTION := "chained actions for makefiles"
 

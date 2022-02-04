@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 11-01-2022 03:23:28
+# Last Modified: 04-02-2022 05:33:46
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -110,7 +110,7 @@ HELP_SPACING ?= 32
 export MKCHAIN_HELP := _mkchain_help
 $(MKCHAIN_HELP):
 ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
-	@$(MAKE) -s $(MKPM_HELP) >$(NULL) || $(TRUE)
+	@$(MAKE) -s $(MKPM_HELP) $(NOFAIL)
 	@$(CAT) $(CURDIR)/Makefile | \
 		$(GREP) -E '^ACTIONS\s+\+=\s+[a-zA-Z0-9].*##' | \
 		$(SED) 's|^ACTIONS\s\++=\s\+||g' | \
