@@ -3,10 +3,10 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-12-2021 04:19:43
+# Last Modified: 22-06-2022 14:35:29
 # Modified By: Clay Risser
 # -----
-# BitSpur Inc (c) Copyright 2021
+# Risser Labs LLC (c) Copyright 2021
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 # limitations under the License.
 
 include mkpm.mk
-include main.mk
 ifneq (,$(MKPM_READY))
+include main.mk
 
 PACK_DIR := $(MKPM_TMP)/pack
 

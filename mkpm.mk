@@ -3,10 +3,10 @@
 # File Created: 27-09-2021 16:33:44
 # Author: Clay Risser
 # -----
-# Last Modified: 22-06-2022 14:24:05
+# Last Modified: 22-06-2022 14:33:59
 # Modified By: Clay Risser
 # -----
-# BitSpur Inc (c) Copyright 2021
+# Risser Labs LLC (c) Copyright 2021
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,16 +28,16 @@ MKPM_PKG_DESCRIPTION := "chained actions for makefiles"
 
 MKPM_PKG_AUTHOR := Clay Risser <clayrisser@gmail.com>
 
-MKPM_PKG_SOURCE := https://gitlab.com/bitspur/community/mkchain.git
+MKPM_PKG_SOURCE := https://gitlab.com/risserlabs/community/mkchain.git
 
 MKPM_PKG_FILES_REGEX :=
 
-MKPM_PACKAGES := \
+export MKPM_PACKAGES_DEFAULT := \
 
-MKPM_REPOS := \
+export MKPM_REPO_DEFAULT := \
 
 ############# MKPM BOOTSTRAP SCRIPT BEGIN #############
-MKPM_BOOTSTRAP := https://bitspur.gitlab.io/community/mkpm/bootstrap.mk
+MKPM_BOOTSTRAP := https://gitlab.com/api/v4/projects/29276259/packages/generic/mkpm/0.2.0/bootstrap.mk
 export PROJECT_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 NULL := /dev/null
 TRUE := true
