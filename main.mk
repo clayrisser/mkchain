@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 04-02-2022 05:33:46
+# Last Modified: 22-06-2022 14:23:52
 # Modified By: Clay Risser
 # -----
 # BitSpur Inc (c) Copyright 2021
@@ -46,15 +46,15 @@ ifeq ($(ROOT),$(PROJECT_ROOT))
 	IS_PROJECT_ROOT := true
 endif
 
-export MKCACHE_CLEAN := $(call rm_rf,$(_MKCACHE_CACHE)) $(NOFAIL)
+export MKCACHE_CLEAN := $(RM) -rf $(_MKCACHE_CACHE) $(NOFAIL)
 
 define done
-$(call touch_m,$(_DONE)/$1)
+$(TOUCH) -m $(_DONE)/$1
 endef
 
 define cache
-$(call mkdir_p,$(shell echo $1 | $(SED) 's|\/[^\/]*$$||g')) && \
-	$(call touch_m,$1)
+$(MKDIR) -p $(shell echo $1 | $(SED) 's|\/[^\/]*$$||g') && \
+	$(TOUCH) -m $1
 endef
 
 define git_deps
@@ -68,7 +68,7 @@ define _ACTION_TEMPLATE
 ~{{ACTION}}: | {{ACTION_DEPENDENCY}} $$({{ACTION_UPPER}}_TARGETS) $$(ACTION)/{{ACTION}}
 +{{ACTION}}: | _{{ACTION}} $$({{ACTION_UPPER}}_TARGETS) $$(ACTION)/{{ACTION}}
 _{{ACTION}}:
-	@$$(call rm_rf,$$(_DONE)/{{ACTION}})
+	@$$(RM) -rf $$(_DONE)/{{ACTION}}
 endef
 export _ACTION_TEMPLATE
 
@@ -78,12 +78,12 @@ endef
 
 define reset
 $(MAKE) -s _$1 && \
-$(call rm_rf,$(ACTION)/$1) $(NOFAIL)
+$(RM) -rf $(ACTION)/$1 $(NOFAIL)
 endef
 
 .PHONY: $(_ACTIONS)/%
 $(_ACTIONS)/%:
-	@$(call mkdir_p,$(@D))
+	@$(MKDIR) -p $(@D)
 ifeq ($(patsubst %.exe,%,$(SHELL)),$(SHELL))
 	@ACTION_BLOCK=$(shell $(ECHO) $@ | $(GREP) -oE "[^\/]+$$") && \
 		ACTION=$$($(ECHO) $$ACTION_BLOCK | $(GREP) -oE "^[^~]+") && \
@@ -98,8 +98,8 @@ endif
 
 -include $(_DONE)/_
 $(_DONE)/_:
-	@$(call mkdir_p,$(@D))
-	@$(call touch,$@)
+	@$(MKDIR) -p $(@D)
+	@$(TOUCH) $@
 
 .PHONY: +%
 +%:
