@@ -3,7 +3,7 @@
 # File Created: 27-09-2021 16:33:44
 # Author: Clay Risser
 # -----
-# Last Modified: 22-06-2022 14:33:59
+# Last Modified: 10-04-2023 18:36:50
 # Modified By: Clay Risser
 # -----
 # Risser Labs LLC (c) Copyright 2021
@@ -22,7 +22,7 @@
 
 MKPM_PKG_NAME := mkchain
 
-MKPM_PKG_VERSION := 0.1.0
+MKPM_PKG_VERSION := 0.1.1
 
 MKPM_PKG_DESCRIPTION := "chained actions for makefiles"
 

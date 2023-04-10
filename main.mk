@@ -3,7 +3,7 @@
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 22-06-2022 14:45:05
+# Last Modified: 10-04-2023 18:36:34
 # Modified By: Clay Risser
 # -----
 # Risser Labs LLC (c) Copyright 2021
@@ -58,7 +58,7 @@ $(MKDIR) -p $(shell echo $1 | $(SED) 's|\/[^\/]*$$||g') && \
 endef
 
 define git_deps
-$(shell $(GIT) ls-files 2>$(NULL) | $(GREP) -E "$1" $(NOFAIL))
+$(shell ($(GIT) ls-files && ($(GIT) lfs ls-files | $(CUT) -d' ' -f3)) | $(SORT) | $(UNIQ) -u | $(GREP) -E "$1" $(NOFAIL))
 endef
 
 define _ACTION_TEMPLATE
