@@ -1,0 +1,14 @@
+{
+  "name": "mkchain",
+  "version": "0.1.2",
+  "description": "chained actions for makefiles",
+  "author": "Clay Risser <clayrisser@gmail.com>",
+  "repo": "git@gitlab.com:bitspur/mkpm/packages.git",
+  "source": "https://gitlab.com/bitspur/mkpm/mkchain.git",
+  "packages": {
+    "default": {}
+  },
+  "repos": {
+    "default": "https://gitlab.com/bitspur/mkpm/packages.git"
+  }
+}
