@@ -1,10 +1,10 @@
-# File: /Makefile
+# File: /Mkpmfile
 # Project: mkchain
 # File Created: 26-09-2021 16:53:36
 # Author: Clay Risser
 # -----
-# Last Modified: 22-06-2022 14:35:29
-# Modified By: Clay Risser
+# Last Modified: 04-08-2023 10:55:30
+# Modified By: dharmendra
 # -----
 # Risser Labs LLC (c) Copyright 2021
 #
@@ -20,8 +20,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include mkpm.mk
-ifneq (,$(MKPM_READY))
+include $(MKPM)/mkpm
 include main.mk
 
 PACK_DIR := $(MKPM_TMP)/pack
@@ -88,4 +87,3 @@ purge: clean
 
 -include $(call actions)
 
-endif
